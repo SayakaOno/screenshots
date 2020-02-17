@@ -1,15 +1,44 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import html2canvas from 'html2canvas';
 
 const App = () => {
   const canvasRef = useRef();
-  const shot = n => {
+  const [imgSrcs, setImgSrcs] = useState([]);
+  const [numbers, setNumbers] = useState([]);
+
+  const randomNumber = () => Math.floor(Math.random() * (200 + 1 - 1)) + 1;
+  const getRandomNumbers = n => {
+    const numbers = [];
     for (let i = 0; i < n; i++) {
-      html2canvas(document.querySelector('#capture' + i.toString())).then(
-        canvas => {
-          canvasRef.current.appendChild(canvas);
-        }
-      );
+      numbers.push(randomNumber());
+    }
+    return numbers;
+  };
+
+  useEffect(() => {
+    setNumbers(getRandomNumbers(11 * 4));
+  }, []);
+
+  const shot = async n => {
+    for (let i = 0; i < n; i++) {
+      html2canvas(document.querySelector('#capture' + i.toString()))
+        .then(canvas => {
+          const imgData = canvas.toDataURL();
+          return imgData;
+        })
+        .then(imgData => {
+          let array = imgSrcs.slice();
+          let img = document.createElement('img');
+          img.src = imgData;
+          array.push(imgData);
+          setImgSrcs(array);
+          canvasRef.current.appendChild(img);
+          let a = document.createElement('a');
+          a.href = imgData;
+          a.download = '#capture' + i.toString() + '.png';
+          a.innerHTML = 'Download';
+          canvasRef.current.appendChild(a);
+        });
     }
   };
   const issues = [
@@ -36,10 +65,9 @@ const App = () => {
   };
 
   const renderPhase = index => {
-    let number = () => Math.floor(Math.random() * (200 + 1 - 1)) + 1;
-
     return (
       <div
+        key={index}
         id={`capture${index}`}
         style={{
           width: 98,
@@ -51,14 +79,15 @@ const App = () => {
           overflow: 'hidden'
         }}
       >
-        {issues.map(issue => {
+        {issues.map((issue, index2) => {
           return (
             <div
+              key={index2}
               style={{
                 position: 'absolute',
                 width: issue[3] - issue[2] - 1,
                 height: issue[1],
-                top: number(),
+                top: numbers[index * index2],
                 left: issue[2],
                 background: issue[4],
                 content: ''
@@ -73,7 +102,7 @@ const App = () => {
   return (
     <div>
       {renderNphases(4)}
-      <div style={{ background: 'yellow' }} onClick={() => shot(4)}>
+      <div style={{ background: 'yellow' }} onClick={async () => shot(4)}>
         button
       </div>
       <div ref={canvasRef}></div>

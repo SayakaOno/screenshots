@@ -95,7 +95,17 @@ const App = () => {
         <div>
           <img src={imgSrcs} />
         </div>
-        <a href={imgSrcs} download="screenshot.png">
+        <a
+          href={imgSrcs}
+          download="screenshot.png"
+          style={{
+            display: 'inline-block',
+            background: 'green',
+            color: '#fff',
+            padding: 3,
+            textDecoration: 'none'
+          }}
+        >
           DOWNLOAD
         </a>
       </div>
@@ -105,8 +115,16 @@ const App = () => {
   return (
     <div>
       {renderNphases(1)}
-      <div style={{ background: 'yellow' }} onClick={async () => shot(1)}>
-        button
+      <div
+        style={{
+          background: 'yellow',
+          padding: 3,
+          width: 100,
+          cursor: 'pointer'
+        }}
+        onClick={async () => shot(1)}
+      >
+        generate image
       </div>
       <div>{imgSrcs ? renderScreenshotAndButton() : null}</div>
     </div>

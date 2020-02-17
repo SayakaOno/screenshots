@@ -2,8 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import html2canvas from 'html2canvas';
 
 const App = () => {
-  const canvasRef = useRef();
-  const [imgSrcs, setImgSrcs] = useState([]);
+  const [imgSrcs, setImgSrcs] = useState('');
   const [numbers, setNumbers] = useState([]);
 
   const randomNumber = () => Math.floor(Math.random() * (200 + 1 - 1)) + 1;
@@ -27,20 +26,11 @@ const App = () => {
           return imgData;
         })
         .then(imgData => {
-          let array = imgSrcs.slice();
-          let img = document.createElement('img');
-          img.src = imgData;
-          array.push(imgData);
-          setImgSrcs(array);
-          canvasRef.current.appendChild(img);
-          let a = document.createElement('a');
-          a.href = imgData;
-          a.download = '#capture' + i.toString() + '.png';
-          a.innerHTML = 'Download';
-          canvasRef.current.appendChild(a);
+          setImgSrcs(imgData);
         });
     }
   };
+
   const issues = [
     // row, hight, start, end, color
     [5, 2, 1, 41, '#3000FF'],
@@ -87,7 +77,7 @@ const App = () => {
                 position: 'absolute',
                 width: issue[3] - issue[2] - 1,
                 height: issue[1],
-                top: numbers[index * index2],
+                top: numbers[index + 1 * index2],
                 left: issue[2],
                 background: issue[4],
                 content: ''
@@ -99,13 +89,26 @@ const App = () => {
     );
   };
 
+  const renderScreenshotAndButton = n => {
+    return (
+      <div>
+        <div>
+          <img src={imgSrcs} />
+        </div>
+        <a href={imgSrcs} download="screenshot.png">
+          DOWNLOAD
+        </a>
+      </div>
+    );
+  };
+
   return (
     <div>
-      {renderNphases(4)}
-      <div style={{ background: 'yellow' }} onClick={async () => shot(4)}>
+      {renderNphases(1)}
+      <div style={{ background: 'yellow' }} onClick={async () => shot(1)}>
         button
       </div>
-      <div ref={canvasRef}></div>
+      <div>{imgSrcs ? renderScreenshotAndButton() : null}</div>
     </div>
   );
 };

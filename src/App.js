@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import html2canvas from 'html2canvas';
 
 const App = () => {
-  const [imgSrcs, setImgSrcs] = useState('');
+  const [imgSrcs, setImgSrcs] = useState([]);
   const [numbers, setNumbers] = useState([]);
 
   const randomNumber = () => Math.floor(Math.random() * (200 + 1 - 1)) + 1;
@@ -15,7 +15,7 @@ const App = () => {
   };
 
   useEffect(() => {
-    setNumbers(getRandomNumbers(11 * 4));
+    setNumbers(getRandomNumbers(11));
   }, []);
 
   const shot = async n => {
@@ -26,7 +26,9 @@ const App = () => {
           return imgData;
         })
         .then(imgData => {
-          setImgSrcs(imgData);
+          const array = imgSrcs.slice();
+          array.push(imgData);
+          setImgSrcs(array);
         });
     }
   };
@@ -89,44 +91,62 @@ const App = () => {
     );
   };
 
-  const renderScreenshotAndButton = n => {
-    return (
-      <div>
-        <div>
-          <img src={imgSrcs} />
+  const renderScreenshotAndButton = () => {
+    return imgSrcs.map(src => {
+      return (
+        <div style={{ display: 'inline-block', marginRight: 10 }}>
+          <div>
+            <img src={src} />
+          </div>
+          <a
+            href={src}
+            download="screenshot.png"
+            style={{
+              display: 'inline-block',
+              background: 'green',
+              color: '#fff',
+              padding: 3,
+              textDecoration: 'none'
+            }}
+          >
+            DOWNLOAD
+          </a>
         </div>
-        <a
-          href={imgSrcs}
-          download="screenshot.png"
-          style={{
-            display: 'inline-block',
-            background: 'green',
-            color: '#fff',
-            padding: 3,
-            textDecoration: 'none'
-          }}
-        >
-          DOWNLOAD
-        </a>
-      </div>
-    );
+      );
+    });
   };
 
   return (
     <div>
       {renderNphases(1)}
-      <div
-        style={{
-          background: 'yellow',
-          padding: 3,
-          width: 100,
-          cursor: 'pointer'
-        }}
-        onClick={async () => shot(1)}
-      >
-        generate image
+      <div style={{ margin: '15px 0' }}>
+        <div
+          style={{
+            display: 'inline-block',
+            background: 'pink',
+            marginRight: 10,
+            padding: 3,
+            width: 100,
+            cursor: 'pointer'
+          }}
+          onClick={() => setNumbers(getRandomNumbers(11))}
+        >
+          generate phase
+        </div>
+        <div
+          style={{
+            display: 'inline-block',
+            background: 'yellow',
+            padding: 3,
+            width: 100,
+            cursor: 'pointer'
+          }}
+          onClick={async () => shot(1)}
+        >
+          screenshot!
+        </div>
       </div>
-      <div>{imgSrcs ? renderScreenshotAndButton() : null}</div>
+      <div>{imgSrcs.length ? renderScreenshotAndButton() : null}</div>
     </div>
   );
 };

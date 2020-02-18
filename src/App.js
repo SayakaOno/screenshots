@@ -4,6 +4,7 @@ import html2canvas from 'html2canvas';
 const App = () => {
   const [imgSrcs, setImgSrcs] = useState([]);
   const [numbers, setNumbers] = useState([]);
+  const [index, setIndex] = useState(null);
 
   const randomNumber = () => Math.floor(Math.random() * (200 + 1 - 1)) + 1;
   const getRandomNumbers = n => {
@@ -92,15 +93,15 @@ const App = () => {
   };
 
   const renderScreenshotAndButton = () => {
-    return imgSrcs.map(src => {
+    return imgSrcs.map((src, index) => {
       return (
-        <div style={{ display: 'inline-block', marginRight: 10 }}>
+        <div key={index} style={{ display: 'inline-block', marginRight: 10 }}>
           <div>
             <img src={src} />
           </div>
           <a
             href={src}
-            download="screenshot.png"
+            download={`screenshot${index}.png`}
             style={{
               display: 'inline-block',
               background: 'green',
@@ -114,6 +115,17 @@ const App = () => {
         </div>
       );
     });
+  };
+
+  const playIndex = () => {
+    let count = 0;
+    const id = setInterval(() => {
+      setIndex(count);
+      count++;
+      if (count === imgSrcs.length) {
+        clearInterval(id);
+      }
+    }, 800);
   };
 
   return (
@@ -146,7 +158,22 @@ const App = () => {
           screenshot!
         </div>
       </div>
-      <div>{imgSrcs.length ? renderScreenshotAndButton() : null}</div>
+      <div>
+        {imgSrcs.length ? (
+          <React.Fragment>
+            {renderScreenshotAndButton()}
+            <div>
+              <div
+                onClick={playIndex}
+                style={{ background: 'blue', margin: '10px 0' }}
+              >
+                PLAY
+              </div>
+              <img src={imgSrcs[index]} />
+            </div>
+          </React.Fragment>
+        ) : null}
+      </div>
     </div>
   );
 };
